@@ -1,0 +1,21 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.0.1",
+	"FriendlyName": "SensorsAnalytics",
+	"Description": "The official Unreal Engine SDK of Sensors Analytics.",
+	"Category": "Analytics",
+	"CreatedBy": "Sensors Data Co., Ltd.",
+	"CreatedByURL": "https://www.sensorsdata.cn",
+	"DocsURL": "https://manual.sensorsdata.cn/sa/latest/unreal-engine-sdk-111247614.html",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"EnabledByDefault" : true,
+	"Modules": [
+		{
+			"Name": "SensorsAnalytics",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		}
+	]
+}

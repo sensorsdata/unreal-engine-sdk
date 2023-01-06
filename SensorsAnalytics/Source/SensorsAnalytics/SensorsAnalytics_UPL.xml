@@ -1,0 +1,153 @@
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+    <resourceCopies>
+    </resourceCopies>
+    <buildGradleAdditions>
+        <insert>
+            dependencies {
+                implementation 'com.sensorsdata.analytics.android:SensorsAnalyticsSDK:6.2.8'
+            }
+        </insert>
+    </buildGradleAdditions>
+    <androidManifestUpdates>
+        <addPermission android:name="android.permission.INTERNET" />
+        <addPermission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    </androidManifestUpdates>
+    <gameActivityImportAdditions>
+        <insert>
+            import android.app.Activity;
+            import android.os.Bundle;
+            import android.view.View;
+            import android.widget.Button;
+            import android.app.Application;
+            import com.sensorsdata.analytics.android.sdk.SAConfigOptions;
+            import com.sensorsdata.analytics.android.sdk.SensorsAnalyticsAutoTrackEventType;
+            import com.sensorsdata.analytics.android.sdk.SensorsDataAPI;
+
+            import org.json.JSONArray;
+            import org.json.JSONObject;
+
+            import java.util.ArrayList;
+            import java.util.HashMap;
+            import java.util.HashSet;
+            import java.util.Iterator;
+            import java.util.Map;
+            import java.util.Set;
+        </insert>
+    </gameActivityImportAdditions>
+    <gameActivityClassAdditions>
+        <insert>
+            public void saStart(String serverUrl, boolean enableLog, int flushNetworkPolicy, int flushInterval, int flushBulkSize, int autoTrackEventType) {
+                SAConfigOptions configOptions = new SAConfigOptions(serverUrl);
+                configOptions.enableLog(enableLog);
+                configOptions.setFlushBulkSize(flushBulkSize);
+                configOptions.setFlushInterval(flushInterval);
+                configOptions.setAutoTrackEventType(autoTrackEventType);
+                SensorsDataAPI.startWithConfigOptions(GameActivity.this, configOptions);
+
+                SensorsDataAPI.sharedInstance().setFlushNetworkPolicy(flushNetworkPolicy);
+            }
+
+            public JSONObject saToJson(String properties) {
+                try {
+                    return new JSONObject(properties);
+                } catch(Exception e) {
+                    // ignore
+                    return null;
+                }
+            }
+
+            public void saEnableSDK() {
+                SensorsDataAPI.enableSDK();
+            }
+
+            public void saDisableSDK() {
+                SensorsDataAPI.disableSDK();
+            }
+
+            public void saRegisterSuperProperties(String properties) {
+                SensorsDataAPI.sharedInstance().registerSuperProperties(saToJson(properties));
+            }
+
+            public void saUnregisterSuperProperty(String superPropertyName) {
+                SensorsDataAPI.sharedInstance().unregisterSuperProperty(superPropertyName);
+            }
+
+            public void saLogin(String loginId) {
+                SensorsDataAPI.sharedInstance().login(loginId);
+            }
+
+            public void saLogout() {
+                SensorsDataAPI.sharedInstance().logout();
+            }
+
+            public void saTrack(String eventName, String properties) {
+                SensorsDataAPI.sharedInstance().track(eventName, saToJson(properties));
+            }
+
+            public void saTrackAppInstall(String properties, boolean disableCallback) {
+                SensorsDataAPI.sharedInstance().trackAppInstall(saToJson(properties), disableCallback);
+            }
+
+            public void saSetOnce(String properties) {
+                SensorsDataAPI.sharedInstance().profileSetOnce(saToJson(properties));
+            }
+
+            public void saSet(String properties) {
+                SensorsDataAPI.sharedInstance().profileSet(saToJson(properties));
+            }
+
+            public void saIncrement(String properties) {
+                try {
+                    JSONObject object = saToJson(properties);
+                    Map map = new HashMap();
+                    Iterator iterator = object.keys();
+                    while (iterator.hasNext()) {
+                        String key = (String) iterator.next();
+                        try {
+                            map.put(key, (Number)object.get(key));
+                        } catch(Exception e) {
+                            // ignore
+                        }
+                    }
+                    SensorsDataAPI.sharedInstance().profileIncrement(map);
+                } catch(Exception e) {
+                    // ignore
+                }
+            }
+
+            public void saAppend(String profile, String properties) {
+                try {
+                    Set set = new HashSet();
+                    JSONArray jsonArray = new JSONArray(properties);
+                    for (int index=0;index &lt; jsonArray.length();index++) {
+                        set.add(jsonArray.getString(index));
+                    }
+                    SensorsDataAPI.sharedInstance().profileAppend(profile, set);
+                } catch(Exception e) {
+                    // ignore
+                }
+            }
+
+            public void saUnset(String profile) {
+                SensorsDataAPI.sharedInstance().profileUnset(profile);
+            }
+
+            public void saDeleteUser() {
+                SensorsDataAPI.sharedInstance().profileDelete();
+            }
+
+            public void saClearSuperProperties() {
+                SensorsDataAPI.sharedInstance().clearSuperProperties();
+            }
+
+            public void saFlush() {
+                SensorsDataAPI.sharedInstance().flush();
+            }
+
+            public void saDeleteAll() {
+                SensorsDataAPI.sharedInstance().deleteAll();
+            }
+        </insert>
+    </gameActivityClassAdditions>
+</root>
+
