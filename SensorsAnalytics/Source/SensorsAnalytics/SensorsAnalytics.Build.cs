@@ -57,9 +57,7 @@ public class SensorsAnalytics : ModuleRules
                 "Json",
                 "JsonUtilities",
                 "Sockets",
-                "EngineSettings",
-                "Settings",
-                "Projects"
+                "EngineSettings"
 			}
 			);
 
@@ -67,6 +65,14 @@ public class SensorsAnalytics : ModuleRules
             {
                 PrivateDependencyModuleNames.Add("UnrealEd");
             }
+
+            PrivateIncludePathModuleNames.AddRange(
+                new string[]
+                {
+                    "Settings",
+                    "Projects"
+                }
+                );
 
             if (Target.Platform == UnrealTargetPlatform.IOS)
             {

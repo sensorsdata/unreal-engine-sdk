@@ -5,13 +5,13 @@ class FSAConstants
 {
 public:
 
-    constexpr static char const* const SA_PC_SDK_VERSION = "0.0.1";
+    constexpr static char const* const SA_PC_SDK_VERSION = "0.0.2";
     constexpr static char const* const SA_PC_SDK_NAME = "UnrealEngine";
 
-    constexpr static char const* const SA_IOS_PLUGIN_VERSION = "unreal_engine:0.0.1";
+    constexpr static char const* const SA_IOS_PLUGIN_VERSION = "unreal_engine:0.0.2";
     constexpr static char const* const SA_IOS_PLUGIN_VERSION_KEY = "$lib_plugin_version";
     
-    constexpr static char const* const SA_ANDROID_PLUGIN_VERSION = "unreal_engine:0.0.1";
+    constexpr static char const* const SA_ANDROID_PLUGIN_VERSION = "unreal_engine:0.0.2";
     constexpr static char const* const SA_ANDROID_PLUGIN_VERSION_KEY = "$lib_plugin_version";
 
 	constexpr static char const* const SA_EVENT_TYPE = "type";

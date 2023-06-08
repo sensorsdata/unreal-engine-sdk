@@ -38,10 +38,6 @@ void FSensorsAnalyticsModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
-    if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
-    {
-        SettingsModule->UnregisterSettings("Project", "Plugins", "Sensors Analytics");
-    }
 
 }
 
