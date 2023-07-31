@@ -1,56 +1,50 @@
 // Copyright 2022 SensorsData. All Rights Reserved.
 #include "SAUtils.h"
-#include <iostream>
-#include <zlib.h>
-#include <sstream>
-#include <iomanip>
-#include <time.h>
+#include "PlatformHttp.h"
 
 FString FSAUtils::Pattern = TEXT("^((?!^distinct_id$|^original_id$|^time$|^properties$|^id$|^first_id$|^second_id$|^users$|^events$|^event$|^user_id$|^date$|^datetime$|^user_tag.*|^user_group.*)[a-zA-Z_$][a-zA-Z\\d_$]*)$");
 
 FString FSAUtils::EncodeData(const FString& UnprocessedStr)
 {
-	// Compatible with Chinese
-	FTCHARToUTF8 ToUtf8Converter(UnprocessedStr.GetCharArray().GetData());
-	auto UnprocessedDataLen = ToUtf8Converter.Length();
-	auto UnprocessedData = ToUtf8Converter.Get();
-    std::string data = std::string(UnprocessedData);
+    // Compatible with Chinese
+    FTCHARToUTF8 ToUtf8Converter(UnprocessedStr.GetCharArray().GetData());
 
-    std::string compressed_data;
-    if (!SACompressString(data, &compressed_data, Z_BEST_COMPRESSION))
+    // Gzip Data
+    auto UnprocessedDataLen = ToUtf8Converter.Length();
+    auto UnprocessedData = ToUtf8Converter.Get();
+    int32 CompressBufferLen = FCompression::CompressMemoryBound(NAME_Gzip, UnprocessedDataLen);
+    void* CompressBuffer = FMemory::Malloc(CompressBufferLen);
+    bool Result = FCompression::CompressMemory(NAME_Gzip, CompressBuffer, CompressBufferLen, UnprocessedData,
+        UnprocessedDataLen, ECompressionFlags::COMPRESS_BiasSpeed);
+
+    FString ResultStr;
+    if (Result)
     {
-        FSALog::Warning(CUR_LOG_POSITION, TEXT("SACompressString Error !"));
+        // Base64 Encode
+        FString Base64EncodeStr = FBase64::Encode((uint8*)CompressBuffer, CompressBufferLen);
+        if (!Base64EncodeStr.IsEmpty())
+        {
+            // Url Encode
+            FString UrlEncodeStr = FPlatformHttp::UrlEncode(Base64EncodeStr);
+            if (!UrlEncodeStr.IsEmpty())
+            {
+                ResultStr = TEXT("data_list=") + UrlEncodeStr + TEXT("&gzip=1");
+            } 
+            else
+            {
+                FSALog::Error(CUR_LOG_POSITION, TEXT("Url Encode Data Error !"));
+            }
+        }
+        else
+        {
+            FSALog::Error(CUR_LOG_POSITION, TEXT("Base64 Encode Data Error !"));
+        }
     }
-
-    const std::string base64_encoded_data = SABase64Encode(compressed_data);
-    std::string request_body = "data_list=" + SAUrlEncode(base64_encoded_data) + "&gzip=1";
-    
-    FString result = request_body.c_str();
-    return result;
-    
-    
-    // Gzip Compress
-	int32 CompressBufferLen = FCompression::CompressMemoryBound(NAME_Gzip, UnprocessedDataLen);
-	void* CompressBuffer = FMemory::Malloc(CompressBufferLen);
-	bool Result = FCompression::CompressMemory(NAME_Gzip, CompressBuffer, CompressBufferLen, UnprocessedData,
-		UnprocessedDataLen, ECompressionFlags::COMPRESS_BiasSpeed);
-
-    // Base64
-	FString CompressedStr; 
-	if ( Result )
-	{
-		CompressedStr = FBase64::Encode((uint8*)CompressBuffer, CompressBufferLen);
-	}
-	else
-	{
-		FSALog::Warning(CUR_LOG_POSITION, TEXT("EncodeData Error !"));
-	}
-	FMemory::Free(CompressBuffer);
-    
-    // Create Data
-    FString ResultStr = TEXT("data_list=") + CompressedStr + TEXT("&gzip=1");
-    FSALog::Warning(CUR_LOG_POSITION, *FString::Printf(TEXT(" AddEvent %s"), *ResultStr));
-    
+    else
+    {
+        FSALog::Error(CUR_LOG_POSITION, TEXT("Gzip Data Error !"));
+    }
+    FMemory::Free(CompressBuffer);
 	return  ResultStr;
 }
 
@@ -216,7 +210,10 @@ FString FSAUtils::MergeProperties(const FString& FirstProperty, const FString& S
     TSharedRef<TJsonReader<>> SecondReader = TJsonReaderFactory<>::Create(SecondProperty);
     FJsonSerializer::Deserialize(SecondReader, SecondDataObject);
 
-    FJsonObject::Duplicate(FirstDataObject, SecondDataObject);
+    for (auto& Elem : FirstDataObject->Values)
+    {
+        SecondDataObject->SetField(Elem.Key, Elem.Value);
+    }
 
     TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RetStr);
     FJsonSerializer::Serialize(SecondDataObject.ToSharedRef(), Writer);
@@ -260,117 +257,6 @@ int64 FSAUtils::GetTrackID()
     return std::stoi(first_sub + second_sub + timestamp_sub);
 }
 
-
-/**
-压缩算法
- **/
-bool FSAUtils::SACompressString(const std::string &str,
-                                std::string *out_string,
-                                int compression_level = Z_BEST_COMPRESSION) {
-  z_stream zs;  // z_stream is zlib's control structure
-  memset(&zs, 0, sizeof(zs));
-
-  if (deflateInit2(&zs, compression_level, Z_DEFLATED,
-                   15 | 16, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
-    std::cerr << "deflateInit2 failed while compressing." << std::endl;
-    return false;
-  }
-
-  zs.next_in = reinterpret_cast<Bytef *>(const_cast<char *>(str.data()));
-  zs.avail_in = static_cast<uInt>(str.size());  // set the z_stream's input
-
-  int ret;
-  char out_buffer[32768];
-
-  // retrieve the compressed bytes blockwise
-  do {
-    zs.next_out = reinterpret_cast<Bytef *>(out_buffer);
-    zs.avail_out = sizeof(out_buffer);
-
-    ret = deflate(&zs, Z_FINISH);
-
-    if (out_string->size() < zs.total_out) {
-      // append the block to the output string
-      out_string->append(out_buffer, zs.total_out - out_string->size());
-    }
-  } while (ret == Z_OK);
-
-  deflateEnd(&zs);
-
-  if (ret != Z_STREAM_END) {  // an error occurred that was not EOF
-    std::cerr << "Exception during zlib compression: (" << ret << ") " << zs.msg
-              << std::endl;
-    return false;
-  }
-
-  return true;
-}
-
-static const char kBase64Chars[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-std::string FSAUtils::SABase64Encode(const std::string &data) {
-  const unsigned char
-      *bytes_to_encode = reinterpret_cast<const unsigned char *>(data.data());
-  size_t in_len = data.length();
-  std::string ret;
-  int i = 0;
-  int j = 0;
-  unsigned char char_array_3[3];
-  unsigned char char_array_4[4];
-
-  while (in_len-- > 0) {
-    char_array_3[i++] = *(bytes_to_encode++);
-    if (i == 3) {
-      char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-      char_array_4[1] =
-          ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-      char_array_4[2] =
-          ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-      char_array_4[3] = char_array_3[2] & 0x3f;
-
-      for (i = 0; (i < 4); i++)
-        ret += kBase64Chars[char_array_4[i]];
-      i = 0;
-    }
-  }
-
-  if (i != 0) {
-    for (j = i; j < 3; j++)
-      char_array_3[j] = '\0';
-    char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-    char_array_4[1] =
-        ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-    char_array_4[2] =
-        ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-    char_array_4[3] = char_array_3[2] & 0x3f;
-    for (j = 0; (j < i + 1); j++)
-      ret += kBase64Chars[char_array_4[j]];
-    while ((i++ < 3))
-      ret += '=';
-  }
-  return ret;
-}
-
-std::string FSAUtils::SAUrlEncode(const std::string &data) {
-  std::ostringstream escaped;
-  escaped.fill('0');
-  escaped << std::hex;
-  for (std::string::size_type i = 0; i < data.size(); ++i) {
-    unsigned char c = data[i];
-    // Keep alphanumeric and other accepted characters intact
-    if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
-      escaped << c;
-      continue;
-    }
-    // Any other characters are percent-encoded
-    escaped << std::uppercase;
-    escaped << '%' << std::setw(2) << int((unsigned char) c);
-    escaped << std::nouppercase;
-  }
-  return escaped.str();
-}
-
 FString FSAUtils::AddPluginVersion(const FString& properties, const FString& key, const FString& value)
 {
     FString RetStr;
@@ -390,22 +276,9 @@ FString FSAUtils::AddPluginVersion(const FString& properties, const FString& key
     return RetStr;
 }
 
-int FSAUtils::GetTimezoneOffset()
+int32 FSAUtils::GetTimezoneOffset()
 {
-    // system time
-    time_t _rt = time(NULL);
-    // system time -> GMT time
-    tm _gtm = *gmtime(&_rt);
-    // system time -> local time
-    tm _ltm = *localtime(&_rt);
-    //    printf("UTC:       %s", asctime(&_gtm));
-    //    printf("local:     %s", asctime(&_ltm));
-    // GMT time -> system time
-    time_t _gt = mktime(&_gtm);
-    tm _gtm2 = *localtime(&_gt);
-    // 此时 _gt 已经与实际的系统时间 _rt 有时区偏移了，计算两个值的之差就是时区偏的秒数，除以 60 就是分钟
-    int offset = - (((_rt - _gt ) + (_gtm2.tm_isdst ? 3600 : 0)) / 60);
-    //    printf(" offset (minutes) %d", offset);
-    
+    FTimespan UTCOffset = FDateTime::Now() - FDateTime::UtcNow();
+    int32 offset = - FMath::RoundToInt(UTCOffset.GetTotalSeconds() / 60);
     return offset;
 }

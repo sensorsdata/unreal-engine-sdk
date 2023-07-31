@@ -8,7 +8,11 @@ namespace UnrealBuildTool.Rules
 {
 public class SensorsAnalytics : ModuleRules
 {
-	public SensorsAnalytics(ReadOnlyTargetRules Target) : base(Target)
+#if WITH_FORWARDED_MODULE_RULES_CTOR
+    public SensorsAnalytics(ReadOnlyTargetRules Target) : base(Target)
+#else
+    public SensorsAnalytics(TargetInfo Target)
+#endif
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -92,13 +96,6 @@ public class SensorsAnalytics : ModuleRules
                 // JNI
                 PublicIncludePathModuleNames.Add("Launch");
             }
-            else if(Target.Platform == UnrealTargetPlatform.Win64)
-            {
-                // add header
-                PublicIncludePaths.Add(Path.GetFullPath(Path.Combine(ModuleDirectory, "../ThirdParty/Windows/zlib_x64/Include")));
-                // add lib
-                PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "../ThirdParty/Windows/zlib_x64/lib/libz-static.lib"));
-            }
 
         DynamicallyLoadedModuleNames.AddRange(
 			new string[]
@@ -106,22 +103,6 @@ public class SensorsAnalytics : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
-
-        // add zlib library
-        // public bool LoadZlib(TargetInfo Target)
-        // {
-        //    bool isLibararySupported = false;
-        //    if ((Target.Platform == UnrealTargetPlatform.Win64) || (Target.Platform == UnrealTargetPlatform.Win32))
-        //    {
-        //        isLibararySupported = true;
-                // string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64) ? "Win64" : "Win32";
-                // PublicAdditionalLibraries.Add(Path.Combine(LibraryPath, PlatformString + ".lib"));
-                // PublicDelayLoadDLLs.Add(PlatformString + ".dll");
-                // RuntimeDependencies.Add(new RuntimeDependency(LibraryPath + PlatformString + ".dll"));
-        //       PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "../ThirdParty/Windows/zlib_x64/lib/libz-static.lib"));
-        //   }
-        //   return isLibararySupported;
-        // }
 	}
 }
 }

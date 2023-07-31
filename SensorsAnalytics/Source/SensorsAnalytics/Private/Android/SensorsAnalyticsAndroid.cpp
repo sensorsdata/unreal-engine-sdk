@@ -87,7 +87,7 @@ void SensorsAnalyticsAndroid::Track(const FString& EventName, const FString& Pro
     {
         bIsAddPluginVersion = true;
         
-        FString VersionProperties = FSAUtils::AddPluginVersion(Properties, FSAConstants::SA_ANDROID_PLUGIN_VERSION_KEY, FSAConstants::SA_ANDROID_PLUGIN_VERSION);
+        FString VersionProperties = FSAUtils::AddPluginVersion(Properties, FSAConstants::SA_PLUGIN_VERSION_KEY, FSAConstants::SA_PLUGIN_VERSION);
         properties = env->NewStringUTF(TCHAR_TO_UTF8(*VersionProperties));
     }
     

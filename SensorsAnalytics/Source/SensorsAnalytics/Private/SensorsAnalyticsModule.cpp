@@ -10,11 +10,9 @@
 #include "SensorsAnalytics.h"
 #include "SensorsAnalyticsProvider.h"
 
-IMPLEMENT_MODULE(FSensorsAnalyticsModule, SensorsAnalytics)
-
 #define LOCTEXT_NAMESPACE "SensorsAnalyticsModule"
-
 DEFINE_LOG_CATEGORY_STATIC(LogFSensorsAnalyticsModule, Display, All);
+IMPLEMENT_MODULE(FSensorsAnalyticsModule, SensorsAnalytics)
 
 TSharedPtr<IAnalyticsProvider> FSensorAnalyticsProvider::Provider;
 
@@ -38,6 +36,12 @@ void FSensorsAnalyticsModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
+#if WITH_EDITOR
+    if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
+    {
+        SettingsModule->UnregisterSettings("Project", "Plugins", "Sensors Analytics");
+    }
+#endif
 
 }
 

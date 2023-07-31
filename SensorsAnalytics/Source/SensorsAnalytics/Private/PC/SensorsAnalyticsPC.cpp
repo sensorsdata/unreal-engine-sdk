@@ -6,19 +6,21 @@ static USAEventManager* EventManager;
 static bool bEnableSDK;
 static USensorsAnalyticsPCBase* BaseInstance;
 static USensorsAnalyticsPCDisable* DisableInstance;
+static bool bSettingsEnableLog;
 
 void SensorsAnalyticsPC::StartWithConfigOptions(const USensorsAnalyticsSettings * Settings)
-{
-    SetEnableLog(Settings->bEnableLog);
-
-    if ((Settings->ServerUrl).IsEmpty())
-    {
-        FSALog::Error(CUR_LOG_POSITION, TEXT("ServerUrl is empty, start failed !"));
-        return;
-    }
-    
+{       
     if (Manager == nullptr)
     {
+        bSettingsEnableLog = Settings->bEnableLog;
+        SetEnableLog(bSettingsEnableLog);
+
+        if ((Settings->ServerUrl).IsEmpty())
+        {
+            FSALog::Error(CUR_LOG_POSITION, TEXT("ServerUrl is empty, start failed !"));
+            return;
+        }
+
         Manager = new SensorsAnalyticsPC();
        
         bEnableSDK = true;
@@ -61,6 +63,7 @@ void SensorsAnalyticsPC::EnableSDK()
     
     bEnableSDK = true;
     EventManager->SetEnableManager(true);
+    SetEnableLog(bSettingsEnableLog);
 }
 
 void SensorsAnalyticsPC::DisableSDK()
@@ -76,11 +79,19 @@ void SensorsAnalyticsPC::DisableSDK()
         FSALog::Warning(CUR_LOG_POSITION, TEXT("SDK has been disabled !"));
         return;
     }
+
+    USensorsAnalyticsPCBase* Instance = Manager->GetInstance();
+    if (Instance != nullptr)
+    {
+        Instance->Track(TEXT("$AppDataTrackingClose"), TEXT(""));
+        Instance->Flush();
+    }
     
     FSALog::Warning(CUR_LOG_POSITION, TEXT("Disable SDK !"));
     
     bEnableSDK = false;
     EventManager->SetEnableManager(false);
+    SetEnableLog(false);
 }
 
 void SensorsAnalyticsPC::RegisterSuperProperties(const FString& Properties)
@@ -133,7 +144,10 @@ void SensorsAnalyticsPC::Track(const FString& EventName, const FString& Properti
 
 void SensorsAnalyticsPC::TrackAppInstall(const FString& Properties, bool bDisableCallback)
 {
-    FSALog::Warning(CUR_LOG_POSITION, TEXT("Call SensorsAnalyticsPC::TrackAppInstall, the platform is not supported."));
+    USensorsAnalyticsPCBase* Instance = Manager->GetInstance();
+    if (Instance == nullptr) return;
+
+    Instance->TrackAppInstall(Properties, bDisableCallback);
 }
 
 void SensorsAnalyticsPC::SetOnce(const FString& Properties)

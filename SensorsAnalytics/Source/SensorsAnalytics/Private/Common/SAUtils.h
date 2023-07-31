@@ -79,16 +79,10 @@ public:
     static FString MergeProperties(const FString& FirstProperty, const FString& SecondProperty);
     
     static FString RemovePropertyWithKey(const FString& Properties, const FString& Key);
-    
-    static bool SACompressString(const std::string &str, std::string *out_string, int compression_level);
-    
-    static std::string SABase64Encode(const std::string &data);
-    
-    static std::string SAUrlEncode(const std::string &data);
         
     static FString AddPluginVersion(const FString& properties, const FString& key, const FString& value);
     
-    static int GetTimezoneOffset();
+    static int32 GetTimezoneOffset();
 
 private:
 

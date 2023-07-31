@@ -5,14 +5,11 @@ class FSAConstants
 {
 public:
 
-    constexpr static char const* const SA_PC_SDK_VERSION = "0.0.2";
+    constexpr static char const* const SA_PC_SDK_VERSION = "0.0.3";
     constexpr static char const* const SA_PC_SDK_NAME = "UnrealEngine";
 
-    constexpr static char const* const SA_IOS_PLUGIN_VERSION = "unreal_engine:0.0.2";
-    constexpr static char const* const SA_IOS_PLUGIN_VERSION_KEY = "$lib_plugin_version";
-    
-    constexpr static char const* const SA_ANDROID_PLUGIN_VERSION = "unreal_engine:0.0.2";
-    constexpr static char const* const SA_ANDROID_PLUGIN_VERSION_KEY = "$lib_plugin_version";
+    constexpr static char const* const SA_PLUGIN_VERSION = "unreal_engine:0.0.3";
+    constexpr static char const* const SA_PLUGIN_VERSION_KEY = "$lib_plugin_version";
 
 	constexpr static char const* const SA_EVENT_TYPE = "type";
 	constexpr static char const* const SA_EVENT_NAME = "event";
@@ -36,6 +33,7 @@ public:
     constexpr static char const* const SA_EVENT_PRESET_PROPERTY_APP_ID = "$app_id";
     constexpr static char const* const SA_EVENT_PRESET_PROPERTY_APP_VERSION = "$app_version";
     constexpr static char const* const SA_EVENT_PRESET_PROPERTY_IS_FIRST_DAY = "$is_first_day";
+    constexpr static char const* const SA_EVENT_PRESET_PROPERTY_FIRST_VISIT_TIME = "$first_visit_time";
     constexpr static char const* const SA_EVENT_PRESET_PROPERTY_LIB = "$lib";
     constexpr static char const* const SA_EVENT_PRESET_PROPERTY_LIB_VERSION = "$lib_version";
     constexpr static char const* const SA_EVENT_PRESET_PROPERTY_LIB_METHOD = "$lib_method";

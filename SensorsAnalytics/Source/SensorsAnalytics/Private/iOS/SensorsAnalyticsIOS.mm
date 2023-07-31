@@ -34,8 +34,7 @@ void sa_convertToArray(const char *json, NSArray **array)
 
 void SensorsAnalyticsIOS::StartWithConfigOptions(const USensorsAnalyticsSettings * Settings)
 {
-    const char *url = TCHAR_TO_UTF8(*Settings->ServerUrl);
-    NSString *serverUrl = [NSString stringWithUTF8String:url];
+    NSString *serverUrl = [NSString stringWithUTF8String:TCHAR_TO_UTF8(*Settings->ServerUrl)];
     dispatch_block_t block = ^{
         SAConfigOptions *options = [[SAConfigOptions alloc] initWithServerURL:serverUrl launchOptions:nil];
         options.flushNetworkPolicy = Settings->FlushNetworkPolicy;
@@ -100,7 +99,7 @@ void SensorsAnalyticsIOS::Track(const FString& EventName, const FString& Propert
     {
         bIsAddPluginVersion = true;
         
-        FString VersionProperties = FSAUtils::AddPluginVersion(Properties, FSAConstants::SA_IOS_PLUGIN_VERSION_KEY, FSAConstants::SA_IOS_PLUGIN_VERSION);
+        FString VersionProperties = FSAUtils::AddPluginVersion(Properties, FSAConstants::SA_PLUGIN_VERSION_KEY, FSAConstants::SA_PLUGIN_VERSION);
         sa_convertToDictionary(TCHAR_TO_UTF8(*VersionProperties), &properties);
     }
     

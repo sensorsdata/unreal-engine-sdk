@@ -155,7 +155,7 @@ void FSATaskHandle::FlushFromLocalNormal()
 	FScopeLock SetLock(&SetCritical);
 
 	TArray<TSharedPtr<FJsonObject>> SendArray = m_SaveEvent->GetEvents(50);
-	if ( SendArray.IsEmpty() )
+	if ( SendArray.Num() < 1 )
 	{
 		Working = false;
     	FSALog::Info(CUR_LOG_POSITION, TEXT("Flush data is Empty"));

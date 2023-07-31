@@ -160,6 +160,28 @@ void USensorsAnalyticsPCBase::TrackAppInstall(const FString& Properties, bool bD
     {
         this->m_EventManager->EnqueueTrackEvent(FSAConstants::SA_EVENT_NAME_APP_INSTALL, Properties, SAEventType::TRACK);
     }
+
+    // 触发 SetOnce
+    TSharedPtr<FJsonObject> m_SetOncePropertiesJsonObject = MakeShareable(new FJsonObject);
+    FString FirstVisitTime = FDateTime::Now().ToString(TEXT("%Y-%m-%d %H:%M:%S"));
+    if (!FirstVisitTime.IsEmpty())
+    {
+        m_SetOncePropertiesJsonObject->SetStringField(FSAConstants::SA_EVENT_PRESET_PROPERTY_FIRST_VISIT_TIME, FirstVisitTime);
+    }
+
+    TSharedPtr<FJsonObject> SetOncePropertiesJsonObject = MakeShareable(new FJsonObject);
+    TSharedRef<TJsonReader<>> SetOncePropertiesReader = TJsonReaderFactory<>::Create(Properties);
+    FJsonSerializer::Deserialize(SetOncePropertiesReader, SetOncePropertiesJsonObject);
+    for (auto& Elem : SetOncePropertiesJsonObject->Values)
+    {
+        m_SetOncePropertiesJsonObject->SetField(Elem.Key, Elem.Value);
+    }
+
+    FString SetOnceJsonStr;
+    TSharedRef<TJsonWriter<>> SetOnceWriter = TJsonWriterFactory<>::Create(&SetOnceJsonStr);
+    FJsonSerializer::Serialize(m_SetOncePropertiesJsonObject.ToSharedRef(), SetOnceWriter);
+
+    this->m_EventManager->EnqueueUserEvent(FString(FSAConstants::SA_EVENT_TYPE_PROFILE_SET_ONCE), SetOnceJsonStr);
 }
 
 void USensorsAnalyticsPCBase::SetOnce(const FString& Properties)
