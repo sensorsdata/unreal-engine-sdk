@@ -1,5 +1,5 @@
-[![神策数据](https://opensource.sensorsdata.cn/wp-content/uploads/logo.png "神策数据")](https://www.sensorsdata.cn/)
-<br><br>
+<img src="https://ow-file.sensorsdata.cn/www/home/header/sensors_header_icon.svg" width="200" >
+
 [![License](https://img.shields.io/github/license/sensorsdata/unreal-engine-sdk.svg)](https://github.com/sensorsdata/unreal-engine-sdk/blob/main/LICENSE)
 [![GitHub release](https://img.shields.io/github/tag/sensorsdata/unreal-engine-sdk.svg?label=release)](https://github.com/sensorsdata/unreal-engine-sdk/releases)
 [![GitHub release date](https://img.shields.io/github/release-date/sensorsdata/unreal-engine-sdk.svg)](https://github.com/sensorsdata/unreal-engine-sdk/releases)
@@ -22,28 +22,16 @@ Unreal Engine 4.26 及以上版本
 
 请参见 [release 发版记录](https://github.com/sensorsdata/unreal-engine-sdk/releases)
 
-## 讨论
-
-| 扫码加入神策数据开源社区 QQ 群<br>群号：785122381 | 扫码加入神策数据开源社区微信群 |
-| ------ | ------ |
-|![ QQ 讨论群](https://opensource.sensorsdata.cn/wp-content/uploads/ContentCommonPic_1.png) | ![ 微信讨论群 ](https://opensource.sensorsdata.cn/wp-content/uploads/ContentCommonPic_2.png) |
-
-## 公众号
-
-| 扫码关注<br>神策数据开源社区 | 扫码关注<br>神策数据开源社区服务号 |
-| ------ | ------ |
-|![ 微信订阅号 ](https://opensource.sensorsdata.cn/wp-content/uploads/ContentCommonPic_3.png) | ![ 微信服务号 ](https://opensource.sensorsdata.cn/wp-content/uploads/ContentCommonPic_4.png) |
 
 ## 新书推荐
 
-| 《ASM 全埋点开发实战》 | 《数据驱动：从方法到实践》 | 《Android 全埋点解决方案》 | 《iOS 全埋点解决方案》
-| ------ | ------ | ------ | ------ |
-| [![《ASM 全埋点开发实战》](https://opensource.sensorsdata.cn/wp-content/uploads/ASM-全埋点thumbnail_1.jpg)](https://item.jd.com/14058352.html) | [![《数据驱动：从方法到实践》](https://opensource.sensorsdata.cn/wp-content/uploads/data_driven_book_1.jpg)](https://item.jd.com/12322322.html) | [![《Android 全埋点解决方案》](https://opensource.sensorsdata.cn/wp-content/uploads/Android-全埋点thumbnail_1.png)](https://item.jd.com/12574672.html) | [![《iOS 全埋点解决方案》](https://opensource.sensorsdata.cn/wp-content/uploads/iOS-全埋点thumbnail_1.png)](https://item.jd.com/12867068.html)
+| [《数据驱动：从方法到实践》](https://item.jd.com/12322322.html) | [《Android 全埋点解决方案》](https://item.jd.com/12574672.html) | [《iOS 全埋点解决方案》](https://item.jd.com/12867068.html)
+| ------ | ------ | ------ |
 
 
 ## License
 
-Copyright 2015－2023 Sensors Data Inc.
+Copyright 2015－2024 Sensors Data Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
